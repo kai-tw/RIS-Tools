@@ -1,19 +1,24 @@
 <?php
-$raw = mb_convert_encoding(file_get_contents('import.txt'), 'utf-8', 'auto');
-$lines = explode("\n", $raw);
+/**
+ * @return {string} JSON
+ */
+function cityCodeConvertor(string $path) {
+	$raw = mb_convert_encoding(file_get_contents($path), 'utf-8', 'big5');
+	$lines = explode("\n", $raw);
 
-$part = [];
+	$array = [];
 
-foreach ($lines as $line) {
-	if (mb_strlen($line, 'utf-8') <= 0)
-		continue;
+	foreach ($lines as $line) {
+		if (mb_strlen($line, 'utf-8') <= 0)
+			continue;
+			
+		$pos = mb_strpos($line, '=', 0, 'utf-8');
+		$len = mb_strlen($line, 'utf-8');
+		
+		$code = mb_substr($line, 0, $pos, 'utf-8');
+		$name = mb_substr($line, $pos + 1, $len - $pos - 2, 'utf-8');
+		$array[$code] = $name;
+	}
 	
-	$code = mb_substr($line, 0, mb_strpos($line, '=', 0, 'utf-8'), 'utf-8');
-	$name = mb_substr($line, mb_strpos($line, '=', 0, 'utf-8') + 1, mb_strlen($line, 'utf-8'), 'utf-8');
-	$str = "({$code}, '{$name}')";
-	array_push($part, $str);
+	return json_encode($array, JSON_UNESCAPED_UNICODE);
 }
-
-$part = implode(', ', $part);
-
-echo "INSERT INTO `county_name`(`county_code`, `name`) VALUES {$part}";
