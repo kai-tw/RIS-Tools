@@ -2,8 +2,6 @@
 $raw = mb_convert_encoding(file_get_contents('import.txt'), 'utf-8', 'auto');
 $lines = explode("\n", $raw);
 
-echo 'INSERT INTO `county_name`(`county_code`, `name`) VALUES ';
-
 $part = [];
 
 foreach ($lines as $line) {
@@ -18,4 +16,4 @@ foreach ($lines as $line) {
 
 $part = implode(', ', $part);
 
-echo $part;
+echo "INSERT INTO `county_name`(`county_code`, `name`) VALUES {$part}";
